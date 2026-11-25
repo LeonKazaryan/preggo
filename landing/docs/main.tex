@@ -1,0 +1,908 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[a4paper,margin=0.62in]{geometry}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{helvet}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{tikz}
+\usepackage{pifont}
+\usepackage{etoolbox}
+\usepackage{multicol}
+\usepackage{pagecolor}
+\usepackage{colortbl}
+\usepackage{ragged2e}
+
+\renewcommand{\familydefault}{\sfdefault}
+
+% ---------- COLORS ----------
+\definecolor{mainblue}{HTML}{5C6F82}      % спокойный slate для основного документа
+\definecolor{lightblue}{HTML}{EEF3F6}     % мягкий голубовато-серый
+\definecolor{softgray}{HTML}{F7F4F2}      % теплый фон
+
+\definecolor{brandcoral}{HTML}{F29B8F}    % цвет логотипа
+\definecolor{brandcoraldeep}{HTML}{E5867B}% чуть глубже
+\definecolor{brandblush}{HTML}{FDF0EC}    % очень светлый коралловый
+\definecolor{brandrose}{HTML}{F8D8D0}     % промежуточный розовато-коралловый
+
+\definecolor{goodgreen}{HTML}{4E8B62}
+\definecolor{lightgreen}{HTML}{ECF7F0}
+\definecolor{warnorange}{HTML}{D98A3A}
+\definecolor{lightorange}{HTML}{FFF2E5}
+\definecolor{badred}{HTML}{C65A54}
+\definecolor{lightred}{HTML}{FDEDEC}
+
+\definecolor{darktext}{HTML}{25313D}
+\definecolor{mutedtext}{HTML}{6B7280}
+\definecolor{linegray}{HTML}{DED8D4}
+
+\definecolor{hero}{HTML}{F29B8F}
+\definecolor{heroDark}{HTML}{E5867B}
+
+% ---------- GENERAL ----------
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+
+\setlist[itemize]{
+    leftmargin=1.35em,
+    itemsep=3pt,
+    topsep=4pt
+}
+\setlist[enumerate]{
+    leftmargin=1.45em,
+    itemsep=3pt,
+    topsep=4pt
+}
+
+\color{darktext}
+
+% ---------- SECTION STYLE ----------
+\titleformat{\section}
+  {\Large\bfseries\color{mainblue}}
+  {\thesection.}{0.45em}{}
+
+\titleformat{\subsection}
+  {\normalsize\bfseries\color{mainblue}}
+  {\thesubsection}{0.45em}{}
+
+\titlespacing*{\section}{0pt}{14pt}{8pt}
+\titlespacing*{\subsection}{0pt}{10pt}{5pt}
+
+% ---------- HEADER / FOOTER ----------
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{18pt}
+\fancyhead[L]{\textcolor{brandcoraldeep}{\textbf{Preggo}}}
+\fancyhead[R]{\textcolor{mutedtext}{Business Cup Stage 2}}
+\fancyfoot[R]{\textcolor{mutedtext}{\thepage/\pageref{LastPage}}}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\footrulewidth}{0pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{linegray}\leaders\hrule height \headrulewidth\hfill}}
+
+% ---------- SMALL HELPERS ----------
+\newcommand{\cmark}{\textcolor{goodgreen}{\ding{51}}}
+\newcommand{\warnmark}{\textcolor{warnorange}{\ding{72}}}
+\newcommand{\xmark}{\textcolor{badred}{\ding{55}}}
+
+\newcommand{\pill}[2]{%
+\begin{tcolorbox}[
+    enhanced,
+    boxrule=0pt,
+    arc=10pt,
+    colback=#1,
+    left=7pt,right=7pt,top=3pt,bottom=3pt,
+    width=\fittoheight
+]
+\centering \small\bfseries #2
+\end{tcolorbox}
+}
+
+\newcommand{\bluequote}[1]{%
+\begin{tcolorbox}[
+    enhanced,
+    breakable,
+    colback=brandblush,
+    colframe=brandcoraldeep,
+    boxrule=0.85pt,
+    arc=3pt,
+    left=8pt,right=8pt,top=6pt,bottom=6pt
+]
+#1
+\end{tcolorbox}
+}
+
+% ---------- CUSTOM BOXES ----------
+\newtcolorbox{summarybox}[1][]{
+    enhanced,
+    breakable,
+    colback=lightblue,
+    colframe=mainblue,
+    boxrule=1pt,
+    arc=4pt,
+    left=10pt,right=10pt,top=8pt,bottom=8pt,
+    fonttitle=\bfseries,
+    title=#1
+}
+
+\newtcolorbox{softbox}[1][]{
+    enhanced,
+    breakable,
+    colback=brandblush,
+    colframe=brandcoraldeep,
+    boxrule=0.85pt,
+    arc=4pt,
+    left=9pt,right=9pt,top=7pt,bottom=7pt,
+    fonttitle=\bfseries,
+    title=#1
+}
+
+\newtcolorbox{greenbox}[1][]{
+    enhanced,
+    breakable,
+    colback=lightgreen,
+    colframe=goodgreen,
+    boxrule=0.8pt,
+    arc=4pt,
+    left=9pt,right=9pt,top=7pt,bottom=7pt,
+    fonttitle=\bfseries,
+    title=#1
+}
+
+\newtcolorbox{orangebox}[1][]{
+    enhanced,
+    breakable,
+    colback=lightorange,
+    colframe=warnorange,
+    boxrule=0.8pt,
+    arc=4pt,
+    left=9pt,right=9pt,top=7pt,bottom=7pt,
+    fonttitle=\bfseries,
+    title=#1
+}
+
+\newtcolorbox{redbox}[1][]{
+    enhanced,
+    breakable,
+    colback=lightred,
+    colframe=badred,
+    boxrule=0.8pt,
+    arc=4pt,
+    left=9pt,right=9pt,top=7pt,bottom=7pt,
+    fonttitle=\bfseries,
+    title=#1
+}
+
+\newtcolorbox{metriccard}[3]{
+    enhanced,
+    width=\linewidth,
+    boxrule=0pt,
+    arc=5pt,
+    colback=#1,
+    left=9pt,right=9pt,top=8pt,bottom=8pt
+}
+
+% ---------- ITEM STYLE ----------
+\renewcommand\labelitemi{\textcolor{mainblue}{\ding{228}}}
+\renewcommand\labelitemii{\textcolor{mainblue}{\ding{118}}}
+
+% ---------- HERO ----------
+\newcommand{\heroblock}{
+\begin{tcolorbox}[
+    enhanced,
+    colback=hero,
+    colframe=hero,
+    arc=6pt,
+    boxrule=0pt,
+    left=14pt,right=14pt,top=14pt,bottom=14pt,
+    overlay={
+        \begin{scope}
+            \clip (frame.south west) rectangle (frame.north east);
+            \fill[white,opacity=0.08] 
+                ([xshift=-1cm,yshift=2.8cm]frame.south west)
+                rectangle
+                ([xshift=18cm,yshift=4.2cm]frame.south west);
+            \fill[heroDark,opacity=0.18]
+                ([xshift=8.5cm,yshift=-0.2cm]frame.south west)
+                circle (4.2cm);
+            \fill[heroDark,opacity=0.15]
+                ([xshift=13.8cm,yshift=2.9cm]frame.south west)
+                circle (3.1cm);
+        \end{scope}
+    }
+]
+\begin{minipage}[c]{0.18\textwidth}
+    \centering
+    \IfFileExists{Preggo.png}{
+        \begin{tcolorbox}[
+            colback=white,
+            colframe=white,
+            arc=7pt,
+            boxrule=0pt,
+            width=2.8cm,
+            height=2.8cm,
+            halign=center,
+            valign=center,
+            left=2pt,right=2pt,top=2pt,bottom=2pt
+        ]
+        \includegraphics[width=0.92\linewidth]{Preggo.png}
+        \end{tcolorbox}
+    }{
+        \begin{tcolorbox}[
+            colback=white,
+            colframe=white,
+            arc=7pt,
+            boxrule=0pt,
+            width=2.8cm,
+            height=2.8cm,
+            halign=center,
+            valign=center
+        ]
+        \textcolor{brandcoraldeep}{\Large\textbf{P}}
+        \end{tcolorbox}
+    }
+\end{minipage}
+\hfill
+\begin{minipage}[c]{0.77\textwidth}
+    {\color{white}\fontsize{24}{27}\selectfont \textbf{Preggo Unit Economics}}\\[5pt]
+    {\color{white!95}\large B2C FemTech / AI Pregnancy Health Subscription}\\[7pt]
+    {\color{white!88}\normalsize Not just a tracker. A safety system for pregnancy.}
+\end{minipage}
+\end{tcolorbox}
+}
+
+% ---------- METRIC ROW ----------
+\newcommand{\metricrow}{
+\noindent
+\begin{minipage}[t]{0.24\textwidth}
+\begin{tcolorbox}[enhanced,colback=lightgreen,colframe=goodgreen,boxrule=0.8pt,arc=4pt,left=7pt,right=7pt,top=7pt,bottom=7pt]
+{\small\textcolor{mutedtext}{LTV}}\\[3pt]
+{\Large\bfseries \$114.42}
+\end{tcolorbox}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.24\textwidth}
+\begin{tcolorbox}[enhanced,colback=lightblue,colframe=mainblue,boxrule=0.8pt,arc=4pt,left=7pt,right=7pt,top=7pt,bottom=7pt]
+{\small\textcolor{mutedtext}{CAC}}\\[3pt]
+{\Large\bfseries \$34.83}
+\end{tcolorbox}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.24\textwidth}
+\begin{tcolorbox}[enhanced,colback=lightorange,colframe=warnorange,boxrule=0.8pt,arc=4pt,left=7pt,right=7pt,top=7pt,bottom=7pt]
+{\small\textcolor{mutedtext}{LTV/CAC}}\\[3pt]
+{\Large\bfseries 3.28x}
+\end{tcolorbox}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.24\textwidth}
+\begin{tcolorbox}[enhanced,colback=softgray,colframe=darktext,boxrule=0.8pt,arc=4pt,left=7pt,right=7pt,top=7pt,bottom=7pt]
+{\small\textcolor{mutedtext}{Payback}}\\[3pt]
+{\Large\bfseries 2.13 мес}
+\end{tcolorbox}
+\end{minipage}
+}
+
+% ---------- DOCUMENT ----------
+\begin{document}
+
+\heroblock
+
+\vspace{6pt}
+\metricrow
+
+\vspace{8pt}
+
+\begin{summarybox}[\textbf{Суть модели в одном абзаце}]
+Мы строим Preggo как подписочный B2C digital health продукт для беременных женщин. Наша задача в этой модели --- не просто показать красивые цифры, а доказать, что экономика сходится: пользователя можно привлекать, монетизировать и масштабировать без того, чтобы бизнес сгорал на платном трафике.
+
+\vspace{4pt}
+\[
+\boxed{\textbf{LTV = \$114.42}}
+\qquad
+\boxed{\textbf{CAC = \$34.83}}
+\qquad
+\boxed{\textbf{LTV/CAC = 3.28x}}
+\qquad
+\boxed{\textbf{Payback = 2.13 мес}}
+\]
+
+Это значит, что при нашей текущей логике продукт можно масштабировать, если мы удерживаем сильный annual-first pricing и не зависим только от paid acquisition.
+\end{summarybox}
+
+\section{Что именно мы моделируем}
+
+Preggo --- не просто pregnancy tracker и не просто контент-приложение. Мы продаем более дорогую и более сильную ценность:
+
+\begin{itemize}
+    \item continuous monitoring во время беременности;
+    \item AI-интерпретацию симптомов и сигналов риска;
+    \item lab/document scanning;
+    \item doctor-facing reports;
+    \item alerts и понятную картину состояния.
+\end{itemize}
+
+\bluequote{\textbf{Именно поэтому наша монетизация строится не вокруг дешевого entertainment-продукта, а вокруг подписки на спокойствие, контроль и безопасность в критически важный период жизни.}}
+
+\newpage
+
+\section{Портрет пользователя и его поведение}
+
+Чтобы наши assumptions не выглядели абстрактными, мы фиксируем конкретный портрет пользователя, под которого строится вся модель.
+
+\begin{softbox}[\textbf{Пользовательский портрет}]
+\textbf{Emily, 30, first pregnancy, USA}
+
+\begin{itemize}
+    \item первая беременность, 8--16 неделя;
+    \item уже тратит заметные деньги на врачей, анализы и обследования;
+    \item тревожится из-за того, что между визитами к врачу у нее нет контроля;
+    \item постоянно ищет информацию, но не доверяет разрозненным источникам;
+    \item ей не нужны сравнения вроде ``ребенок размером с авокадо'' --- ей нужно понимать свое состояние и риски;
+    \item здоровье ребенка для нее абсолютный приоритет, поэтому она готова платить за инструмент, который дает спокойствие, контроль и раннее замечание рисков.
+\end{itemize}
+\end{softbox}
+
+\textbf{Связь с продуктом и pricing:}  
+Мы сознательно не конкурируем с дешевыми pregnancy apps, которые продают контент и вовлечение. Мы строим продукт для пользователей вроде Emily, которым недостаточно ``интересных фактов'' --- им нужно понимать свое состояние и заранее замечать риски. Именно поэтому наша модель предполагает более высокий ARPU и premium pricing.
+
+\textbf{Важно:}  
+Все ключевые assumptions в нашей модели --- conversion, pricing, retention и каналы привлечения --- строятся именно вокруг такого пользователя. Это не массовый пользователь всех pregnancy apps, а более узкий сегмент с высокой готовностью платить за контроль, безопасность и предсказуемость.
+
+\section{Откуда берутся assumptions}
+
+Все исходные числа вынесены в Excel в лист \textbf{Assumptions}. Это важно: мы специально отделили assumptions от итоговых метрик, чтобы не было ``магических чисел''.
+
+Ниже логика по каждому ключевому input'у.
+
+\subsection{Цены: \$159 annual и \$15 monthly}
+
+\begin{softbox}[\textbf{Базовые цены продукта}]
+\begin{itemize}
+    \item \textbf{Annual plan = \$159}
+    \item \textbf{Monthly plan = \$15}
+\end{itemize}
+\end{softbox}
+
+Почему такие расценки:
+\begin{itemize}
+    \item беременность --- это не одноразовая проблема на 1 неделю;
+    \item ценность продукта высокая: здоровье матери + безопасность ребенка;
+    \item annual-план дает лучший cash flow, лучше удерживает пользователя и лучше бьется с жизненным циклом беременности.
+\end{itemize}
+
+В Excel это лежит в листе \textbf{Assumptions} как основные editable inputs.
+
+\subsection{Почему annual share = 80\%, а monthly share = 20\%}
+
+В этот \textbf{assumption} мы закладываем, что большинство платящих пользователей выберут annual, потому что:
+
+\begin{itemize}
+    \item use case долгий: беременность тянется месяцами;
+    \item core value у нас не развлекательная, а тревожно-медицинская;
+    \item в такой категории многие готовы платить upfront, если получают ощущение контроля и safety;
+    \item monthly-план нужен как entry option для менее уверенных пользователей, но мы не строим экономику на нем.
+\end{itemize}
+
+То есть 80/20 --- это \textbf{наша рабочая гипотеза для base-case}, а не абсолютная истина. Именно поэтому в Excel есть лист \textbf{Sensitivity}, где annual mix отдельно стресс-тестится.
+
+\[
+\text{Annual Share} = 80\%, \qquad \text{Monthly Share} = 20\%
+\]
+
+Monthly share в Excel считается как:
+\[
+\text{Monthly Share} = 1 - \text{Annual Share}
+\]
+
+\subsection{Почему monthly users платят 6 месяцев}
+
+Тоже assumption. Мы не говорим, что любой monthly user сидит с нами весь срок беременности. Мы берем \textbf{умеренно-консервативную оценку}:
+
+\begin{itemize}
+    \item кто-то купит monthly ``попробовать'';
+    \item кто-то зайдет позже, не в первом месяце беременности;
+    \item кто-то может отвалиться раньше;
+    \item поэтому в base-case мы берем не 9 месяцев и не 12, а \textbf{6 месяцев}.
+\end{itemize}
+
+Это не агрессивная цифра, а скорее осторожная.  
+В Excel это input \textbf{Months on monthly plan = 6} на листе \textbf{Assumptions}.
+
+\subsection{Почему platform fee = 15\%}
+
+Мы закладываем комиссию платформы и платежной инфраструктуры на уровне:
+\[
+15\%
+\]
+
+Это агрегированное допущение под mobile subscription продукт: app store fee + processing + небольшой operational friction. Мы сознательно не ставим слишком низкое число, чтобы не сделать модель искусственно красивой.
+
+\subsection{Почему variable cost per paid user = \$9}
+
+Это переменные расходы на обслуживание одного платящего пользователя:
+
+\begin{itemize}
+    \item AI inference;
+    \item cloud/storage;
+    \item document processing;
+    \item basic support;
+    \item backend usage tied to actual paying usage.
+\end{itemize}
+
+То есть это не fixed cost команды и не burn компании, а именно \textbf{variable delivery cost per paid user}. Важно разделять эти вещи, иначе LTV получится грязным.
+
+\subsection{Почему CPI = \$3.8}
+
+\textbf{CPI} --- стоимость одной установки приложения с платного трафика.
+
+\begin{softbox}[\textbf{Base-case}]
+\[
+CPI = \$3.8
+\]
+\end{softbox}
+
+Пояснение:
+\begin{itemize}
+    \item health / pregnancy --- это не самый дешевый consumer category;
+    \item аудитория узкая и качественная;
+    \item продукт дорогой по perceived value, значит можно терпеть не самый низкий CPI;
+    \item при этом \$3.8 --- это не запредельно высокий CPI для эмоциональной мобильной ниши.
+\end{itemize}
+
+Это base-case для paid social/performance логики. В \textbf{Sensitivity} мы отдельно проверяем, что будет при худшем CPI.
+
+\subsection{Почему install \textrightarrow paid conversion = 6\%}
+
+Это один из самых важных assumptions в нашей модели.
+
+\begin{greenbox}[\textbf{Ключевой assumption}]
+\[
+\text{Install \textrightarrow Paid Conversion} = 6\%
+\]
+\end{greenbox}
+
+То есть из 100 установок:
+\[
+100 \times 6\% = 6 \text{ платящих пользователей}
+\]
+
+Почему мы считаем это уместным:
+\begin{itemize}
+    \item высокий intent: беременность --- сильный pain-driven use case;
+    \item продукт решает тревогу, а не просто развлекает;
+    \item у нас strong premium promise: AI monitoring, alerts, doctor reports;
+    \item paywall можно строить вокруг реальной ценности, а не вокруг cosmetic features.
+\end{itemize}
+
+Но мы понимаем, что именно conversion --- уязвимое место любой early-stage модели. Поэтому в Excel на листе \textbf{Sensitivity} мы отдельно показываем, как при снижении conversion экономика быстро ухудшается.
+
+\subsection{Почему paid share = 55\%, а organic/referral share = 45\%}
+
+\textbf{Это доля платящих пользователей по источнику привлечения}.
+
+\[
+55\% \text{ платящих пользователей приходят из paid}
+\]
+\[
+45\% \text{ платящих пользователей приходят из organic/referrals/doctors/creators}
+\]
+
+Почему так:
+\begin{itemize}
+    \item в начале paid нужен для скорости и тестов;
+    \item но health-продукт опасно строить только на платной рекламе;
+    \item доверие, рекомендации, word-of-mouth и doctor validation здесь реально важны;
+    \item без органики blended CAC будет слишком тяжелым.
+\end{itemize}
+
+Именно это и показывает наш лист \textbf{GTM\_Plan}: мы специально не делаем вид, что весь рост идет только через ads.
+
+\subsection{Почему average monetized months = 7}
+
+Это число используется для \textbf{payback}, а не для gross revenue monthly-plan users.  
+Тут легко запутаться, поэтому важно разделять:
+
+\begin{itemize}
+    \item \textbf{6 месяцев} --- это сколько в среднем платит monthly subscriber;
+    \item \textbf{7 месяцев} --- это effective monetized window, по которому мы размазываем LTV для расчета payback.
+\end{itemize}
+
+Почему 7 месяцев:
+\begin{itemize}
+    \item пользователь не обязательно приходит в первый день беременности;
+    \item кто-то подключается позже;
+    \item часть ценности остается и на раннем postpartum этапе;
+    \item мы берем не максимальный срок, а рабочий средний горизонт монетизации.
+\end{itemize}
+
+То есть это не ``биологическая длина беременности'', а \textbf{модельный горизонт возврата CAC}.
+
+\section{Как считается revenue и LTV}
+
+В Excel это лежит на листе \textbf{Unit\_Economics}. Ниже та же логика в явном виде.
+
+\subsection{Weighted gross revenue per paid user}
+
+Один платящий пользователь в нашей модели не всегда одинаковый:
+\begin{itemize}
+    \item 80\% берут annual;
+    \item 20\% берут monthly.
+\end{itemize}
+
+Поэтому gross revenue считаем как взвешенное среднее:
+
+\[
+\text{Revenue} =
+(\text{Annual Share} \times \text{Annual Price})
++
+(\text{Monthly Share} \times \text{Monthly Price} \times \text{Months on Monthly})
+\]
+
+Подставляем:
+\[
+\text{Revenue} =
+0.8 \times 159 + 0.2 \times 15 \times 6
+\]
+
+\[
+= 127.2 + 18 = \textbf{145.2}
+\]
+
+Смысл числа \$145.2:  
+это \textbf{средний gross revenue на одного платящего пользователя}, если смотреть на смешанную базу annual + monthly.
+
+\subsection{Net revenue after fee}
+
+Из gross revenue мы вычитаем platform fee:
+
+\[
+\text{Net Revenue} = 145.2 \times (1 - 0.15)
+\]
+
+\[
+= 145.2 \times 0.85 = \textbf{123.42}
+\]
+
+\subsection{Contribution LTV}
+
+Теперь вычитаем variable cost per paid user:
+
+\[
+\text{LTV} = 123.42 - 9 = \textbf{114.42}
+\]
+
+Важно: здесь мы считаем именно \textbf{contribution LTV}, а не просто revenue LTV.  
+То есть мы уже убрали переменные затраты и считаем более честную экономику.
+
+\begin{orangebox}[\textbf{Почему это консервативная модель}]
+Мы сознательно \textbf{не включаем repeat pregnancies} в базовый LTV. Да, в реальной жизни часть пользователей может вернуться в следующую беременность. Но для competition-логики нам выгоднее показывать более строгую модель: один жизненный цикл пользователя без учета повторных беременностей и возврата к приложению.
+\end{orangebox}
+
+\section{Как считается CAC}
+
+\subsection{Paid CAC}
+
+Если установка стоит \$3.8, а в оплату конвертируется 6\% установок, тогда стоимость одного paid user через paid traffic:
+
+\[
+CAC_{paid} = \frac{3.8}{0.06} = \textbf{63.33}
+\]
+
+Это означает:  
+чтобы получить одного платящего пользователя только из paid, нам нужно в среднем потратить \$63.33.
+
+\subsection{Почему blended CAC ниже}
+
+Но реальный бизнес не должен жить только на paid.  
+Поэтому мы используем blended model:
+
+\begin{itemize}
+    \item 55\% платящих пользователей --- paid;
+    \item 45\% --- organic/referral/doctors/creators.
+\end{itemize}
+
+Тогда blended CAC считается так:
+
+\[
+CAC_{blended} = CAC_{paid} \times \text{Paid Share}
+\]
+
+\[
+= 63.33 \times 0.55 = \textbf{34.83}
+\]
+
+\bluequote{\textbf{Экономика Preggo работает не потому, что paid magically super cheap, а потому что paid усиливается органикой и доверием.}}
+
+\section{Главные итоговые метрики}
+
+\subsection{LTV / CAC}
+
+\[
+\frac{114.42}{34.83} = \textbf{3.28x}
+\]
+
+Пояснение коэффицентов:
+\begin{itemize}
+    \item если метрика ниже 1x --- бизнес теряет деньги;
+    \item около 2x --- уже что-то есть, но масштабировать опасно;
+    \item \textbf{3x+} --- это уже выглядит как отличная база для роста.
+\end{itemize}
+
+Наше значение:
+\[
+\textbf{3.28x}
+\]
+
+Это значит, что модель выглядит \textbf{масштабируемой}, если мы удерживаем conversion и annual mix.
+
+\subsection{Payback period}
+
+Сначала считаем monthly contribution:
+
+\[
+\text{Monthly Contribution} = \frac{114.42}{7} = \textbf{16.35}
+\]
+
+Потом payback:
+
+\[
+\text{Payback} = \frac{34.83}{16.35} = \textbf{2.13 \text{ мес}}
+\]
+
+Примерно за 2.1 месяца мы отбиваем стоимость привлечения пользователя.
+
+Это сильный результат, потому что:
+\begin{itemize}
+    \item капитал возвращается быстро;
+    \item деньги можно реинвестировать;
+    \item модель не требует сверхдолгого ожидания окупаемости.
+\end{itemize}
+
+\begin{greenbox}[\textbf{Главный вывод по метрикам}]
+\[
+\boxed{\text{LTV = \$114.42}}
+\qquad
+\boxed{\text{CAC = \$34.83}}
+\qquad
+\boxed{\text{LTV/CAC = 3.28x}}
+\qquad
+\boxed{\text{Payback = 2.13 мес}}
+\]
+\end{greenbox}
+
+\section{Что в модели самое чувствительное}
+
+Вот тут как раз нужен лист \textbf{Sensitivity}. Он показывает: не все assumptions одинаково важны.
+
+\begin{redbox}[\textbf{Самые критичные переменные}]
+\begin{enumerate}
+    \item \textbf{Annual mix}  
+    если доля annual падает, revenue и LTV сразу проседают;
+
+    \item \textbf{Install \textrightarrow Paid conversion}  
+    если conversion падает ниже base-case, paid CAC резко ухудшается;
+
+    \item \textbf{Paid share}  
+    если органика не заводится, blended CAC становится тяжелее;
+
+    \item \textbf{CPI}  
+    если аукцион дороже, то paid growth становится менее комфортным.
+\end{enumerate}
+\end{redbox}
+
+Именно поэтому в нашей модели есть три сценария:
+\begin{itemize}
+    \item base;
+    \item conservative;
+    \item optimistic.
+\end{itemize}
+
+Мы понимаем, где модель может просесть, и заранее это проверяем.
+
+\section{Как это связано с GTM}
+
+Лист \textbf{GTM\_Plan} отвечает на вопрос из brief'а:  
+\textbf{откуда именно будут приходить пользователи и почему эти каналы подходят нам.}
+
+\begin{softbox}[\textbf{Логика каналов роста}]
+\begin{itemize}
+    \item \textbf{Paid social ads} --- быстрый тест messaging, креативов и paywall;
+    \item \textbf{Organic referrals} --- снижают blended CAC;
+    \item \textbf{Doctors / clinics} --- добавляют trust;
+    \item \textbf{Creators / mom communities} --- дают social proof;
+    \item \textbf{ASO / search content} --- ловят already-existing intent.
+\end{itemize}
+\end{softbox}
+
+То есть наша модель пытается выиграть за счет сочетания:
+\[
+\text{value} + \text{trust} + \text{organic reinforcement}
+\]
+
+
+\section{Competitor analysis и почему Preggo может выиграть}
+
+Для Preggo эта секция, как и для любого другого стартапа важна, потому что мы не выходим в пустой рынок --- мы выходим в большую категорию pregnancy / women’s health apps, где уже есть сильные игроки, но большинство из них продают в первую очередь \textbf{контент, трекинг, weekly updates, community и визуализацию развития ребенка}, а не систему раннего замечания рисков и doctor-ready monitoring.
+
+\newpage
+
+\begin{softbox}[\textbf{Ключевая логика нашего позиционирования}]
+Мы не пытаемся быть ``еще одним приложением про беременность''.  
+Мы сознательно занимаем более узкую и более дорогую позицию:
+
+\begin{itemize}
+    \item не \textbf{content-first}, а \textbf{safety-first};
+    \item не \textbf{``what week am I on?''}, а \textbf{``what is happening with my body right now?''};
+    \item не \textbf{развлечение и вовлечение}, а \textbf{monitoring, interpretation, alerts и doctor-facing reports}.
+\end{itemize}
+\end{softbox}
+
+\subsection{Direct competitors}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{|p{2.4cm}|p{2.5cm}|p{3.3cm}|p{3.4cm}|X|}
+\hline
+\rowcolor{lightblue}
+\textbf{Игрок} & \textbf{Публичный pricing anchor} & \textbf{Что продает пользователю} & \textbf{Сильные стороны} & \textbf{Где есть окно для Preggo} \\
+\hline
+\textbf{Flo} & Premium subscription; публично встречаются monthly/yearly offers, в том числе annual around \$59.99 и monthly around \$11.49 в US listing / market intelligence & cycle + fertility + pregnancy tracking, symptom logging, health content, privacy layer & очень сильный бренд, massive scale, привычка пользователя, сильный контентный движок, privacy positioning & Flo --- широкий women’s health product, а не pregnancy-specific safety system. Он силен как broad companion, но не строится вокруг lab scanning, doctor reports и continuous pregnancy risk layer. Также в последнее время юзеры жаловались на проблемы с сохранностью данных и на их продажу, что подпортило доверие компании \\
+\hline
+\textbf{Pregnancy+} & freemium / premium / in-app purchases & weekly pregnancy content, expert articles, baby development visuals, interactive 3D models & очень сильный emotional UX, визуализация ребенка, понятный mass-market продукт, huge download base & продукт в основном про guidance, content и visualization. Это очень хороший emotional tracker, но не полноценная decision-support система для риска и интерпретации данных \\
+\hline
+\textbf{Glow Nurture} & Glow Premium publicly positioned around \$59.99/year & pregnancy tracking, personalized tips, reminders, community, AI-style insights / comparisons & экосистема Glow, community, strong habit loop, familiar journaling/logging model & даже при AI wording core product все еще ближе к tracking + support + community, чем к medically structured monitoring и doctor-facing output \\
+\hline
+\textbf{What to Expect} & в публичном positioning упор больше на trusted content/community, чем на premium medical layer & weekly updates, due date tracking, articles, baby-size metaphors, community/forums & сильный media brand, доверие, SEO/content moat, огромный top-of-funnel & отличный informational brand, но не deep monitoring product. Это скорее education + community layer, чем safety infrastructure \\
+\hline
+\textbf{Preggo} & \textbf{\$159 annual / \$15 monthly} & continuous monitoring, AI risk logic, lab/document scanner, alerts, doctor report & более сильная value density на одну беременность; clearer premium logic; closer to actionable healthcare workflow & наш риск --- выше цена и уже аудитория. Но именно за счет этого у нас выше ARPU и право на более сильную unit economics модель \\
+\hline
+\end{tabularx}
+\end{center}
+
+\subsection{Связь с pricing}
+
+Наш pricing выше, чем у типичных контентных pregnancy apps, и это \textbf{осознанно}. Мы не обязаны стоить как mass-market tracker, если даем продукт другого класса.
+
+\begin{orangebox}[\textbf{Почему premium pricing уместен}]
+Большинство существующих игроков монетизируют:
+\begin{itemize}
+    \item контент;
+    \item эмоциональную вовлеченность;
+    \item трекинг недели беременности;
+    \item community / education.
+\end{itemize}
+
+Preggo монетизирует более дорогую ценность:
+\begin{itemize}
+    \item снижение тревоги между визитами к врачу;
+    \item интерпретацию симптомов и биоданных;
+    \item раннее замечание отклонений;
+    \item удобную упаковку данных для визита к врачу.
+\end{itemize}
+
+То есть \$159 annual --- это не ``дорогой pregnancy content app'', а \textbf{дешевый по сравнению с ценой неопределенности, лишних визитов, missed signals и когнитивной перегрузки во время беременности}.
+\end{orangebox}
+
+\subsection{Marketing competitor analysis}
+
+Даже маркетинг конкурентов показывает, что категория в основном продается через более мягкие углы:
+
+\begin{itemize}
+    \item \textbf{Flo} продвигает privacy, symptom tracking, personalized insights и broad women’s health utility;
+    \item \textbf{Pregnancy+} делает акцент на beautiful 3D baby development, weekly guidance, expert content и emotional support;
+    \item \textbf{Glow Nurture} продвигает personalized pregnancy tracking, community и ``Is this normal?''-style reassurance;
+    \item \textbf{What to Expect} исторически очень силен через trusted content, week-by-week guidance и community brand.
+\end{itemize}
+
+\bluequote{\textbf{Общий паттерн рынка: большинство конкурентов продают информацию, привычку и эмоциональную поддержку. Preggo должен продавать спокойствие через actionable monitoring.}}
+
+Из этого для нас следует конкретная marketing-логика:
+
+\begin{greenbox}[\textbf{Какие message angles разумно использовать Preggo}]
+\begin{enumerate}
+    \item \textbf{``Know earlier, worry less''}  
+    не просто ``следи за беременностью'', а ``раньше замечай сигналы риска'';
+
+    \item \textbf{``From scattered symptoms to one clear picture''}  
+    не ручной хаос и заметки, а единая картина состояния;
+
+    \item \textbf{``Doctor-ready, not just mom-content''}  
+    не только статьи и baby-size metaphors, а данные, которые можно показать врачу;
+
+    \item \textbf{``Your pregnancy, interpreted''}  
+    не просто logging, а интерпретация и приоритизация того, на что реально стоит обратить внимание.
+\end{enumerate}
+\end{greenbox}
+
+\subsection{Почему это усиливает нашу экономику}
+
+Competitor analysis важен не сам по себе, а потому что он объясняет, \textbf{почему наш ARPU и annual-first model вообще имеют право на существование}.
+
+\begin{itemize}
+    \item если бы мы были еще одним weekly-content tracker, то \$159 annual выглядел бы слишком агрессивно;
+    \item но если продукт действительно решает pain of uncertainty, improves monitoring и экономит ментальную нагрузку, higher willingness-to-pay становится логичной;
+    \item именно поэтому наша unit economics строится не на mass-market entertainment logic, а на \textbf{higher-value, narrower-segment monetization}.
+\end{itemize}
+
+\begin{tcolorbox}[
+    enhanced,
+    breakable,
+    colback=brandblush,
+    colframe=brandcoraldeep,
+    boxrule=0.85pt,
+    arc=4pt,
+    left=10pt,right=10pt,top=8pt,bottom=8pt
+]
+\textbf{Финальный вывод по конкурентам.}
+Рынок не пустой, но он занят в основном продуктами, которые отлично объясняют беременность, сопровождают ее и вовлекают пользователя через контент, комьюнити и визуализацию. Preggo идет не в лобовую войну за ``лучший контент'', а в более защищенную позицию: \textbf{pregnancy intelligence + monitoring + risk interpretation + doctor-facing output}. Именно это и делает наш premium pricing и наши unit economics более защищенными.
+\end{tcolorbox}
+
+\vspace{4pt}
+{\footnotesize \textcolor{mutedtext}{Источники для competitor block: Flo official product/help pages, Flo market pricing listings, Philips Pregnancy+ official pages, Glow official site and Nurture pages, What to Expect official app listings, Meta Ads Library public page listings. Цены и офферы могут отличаться по стране, платформе и промо-периоду, поэтому в модели они используются как публичные рыночные anchors, а не как immutable constants.}}
+
+\section{Почему мы считаем модель реалистичной}
+
+Мы специально не делали модель сказочной. Наоборот:
+
+\begin{itemize}
+    \item не включали repeat pregnancies в base LTV;
+    \item не ставили слишком низкий CPI;
+    \item не ставили absurdly high conversion;
+    \item оставили variable costs;
+    \item показали sensitivity, а не одну ``идеальную'' картинку.
+\end{itemize}
+
+Мы не говорим, что все будет идеально. Мы говорим, что даже при достаточно собранной и трезвой модели Preggo уже выглядит как продукт с отличной unit economics.
+
+\section{Финальный вывод}
+
+Экономика Preggo строится на трех вещах:
+
+\begin{enumerate}
+    \item \textbf{Annual-first pricing}  
+    потому что use case длинный и ценность высокая;
+
+    \item \textbf{Сильный premium promise}  
+    потому что мы продаем не просто трекинг, а спокойствие, интерпретацию и раннее замечание рисков;
+
+    \item \textbf{Blended acquisition}  
+    потому что в health-категории нельзя жить только на paid ads.
+\end{enumerate}
+
+\vspace{3pt}
+
+\begin{tcolorbox}[
+    enhanced,
+    breakable,
+    colback=brandblush,
+    colframe=brandcoraldeep,
+    boxrule=0.9pt,
+    arc=5pt,
+    left=12pt,right=12pt,top=10pt,bottom=10pt,
+    borderline west={3pt}{0pt}{brandcoraldeep}
+]
+{\color{brandcoraldeep}\Large\bfseries Финальная позиция}\\[6pt]
+{\color{darktext}
+Наша логика простая: Preggo --- это не просто красивая идея, а продукт, у которого сходится экономика. Мы понимаем, откуда берутся пользователи, как они монетизируются, какие assumptions самые важные и где находятся главные риски. А значит, это уже не просто концепт --- это бизнес, который можно защищать, тестировать и масштабировать.
+}
+\end{tcolorbox}
+
+\vfill
+\begin{center}
+\textcolor{mutedtext}{Kazaryan Leon, Adlet Dautbek}
+\end{center}
+
+\end{document}

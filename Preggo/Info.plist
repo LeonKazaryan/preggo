@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSHealthShareUsageDescription</key>
+	<string>Preggo monitors your maternal bio-markers to detect early risk signals.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Preggo may write analysis results to your Health data.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Preggo scans your lab reports to extract results automatically.</string>
+</dict>
+</plist>

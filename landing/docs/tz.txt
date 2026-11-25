@@ -1,0 +1,665 @@
+ТЗ на лендинг Preggo в стиле Apple scroll-storytelling
+
+1. Общая задача
+
+Нужно сделать премиальный, очень дорогой по ощущению, cinematic landing page для Preggo — AI-платформы для безопасной беременности.
+
+Это не обычный сайт с блоками.
+Это должен быть Apple-style scroll experience, где пользователь не просто читает сайт, а проходит через историю:
+
+uncertainty → interpretation → clarity → control
+
+Сайт должен продавать не “милое приложение для беременных”, а ощущение:
+	•	уверенности
+	•	контроля
+	•	спокойствия
+	•	технологичности
+	•	медицинской серьезности
+	•	premium digital health experience
+
+Preggo по своей сути — это не контентное pregnancy app, а safety-first system с continuous monitoring, AI risk logic, lab/document scanner, doctor-facing reports и alerts. Это прямо следует из нашей продуктовой логики и материалов по Stage 1–2.  ￼  ￼
+
+⸻
+
+2. Референс и ощущение
+
+Основной референс
+
+Сайт должен ощущаться почти как Apple product page:
+	•	большой cinematic hero
+	•	очень сильный фокус на одном главном устройстве/объекте в центре
+	•	длинный скролл с постепенным раскрытием продукта
+	•	крупная типографика
+	•	много воздуха
+	•	очень дорогие transitions
+	•	минимум визуального шума
+	•	одна мысль за экран
+	•	секции работают как сцены
+
+У Apple сейчас особенно сильны такие приемы:
+	•	выразительный, “delightful” визуальный стиль с полупрозрачностью и акцентом на фокусе на контенте.  ￼
+	•	плавные collapse / zoom transitions, когда крупный hero уменьшается в компактную навигацию или следующий блок.  ￼
+	•	immersive-подача продукта как отдельного experience, а не просто списка характеристик.  ￼
+
+Что должно ощущаться по вайбу
+
+Смесь из:
+	•	Apple
+	•	Apple Health
+	•	Oura
+	•	Whoop
+	•	premium wellness / digital health brand
+	•	немного sci-fi, но мягко
+	•	без дешевого “cute pregnancy app” вайба
+
+⸻
+
+3. Главная идея лендинга
+
+One-line idea
+
+Preggo is your confidence in pregnancy.
+
+Основной messaging
+
+Не продавать:
+	•	baby size comparisons
+	•	милый контент
+	•	развлекательный трекер
+
+Продавать:
+	•	early understanding
+	•	risk awareness
+	•	one clear picture
+	•	doctor-ready intelligence
+	•	calm through actionable monitoring
+
+Ключевые фразы для подачи
+
+Использовать как основу tone of voice:
+	•	Know earlier. Worry less.
+	•	Not just tracking. Understanding.
+	•	Your pregnancy. Fully understood.
+	•	This is not a pregnancy app. This is a safety system.
+	•	One system. One clear picture.
+	•	You can’t control everything. But you can understand.
+
+⸻
+
+4. Цель сайта
+
+Основная цель
+
+Конверсия в primary CTA:
+	•	Join beta
+	•	Get early access
+	•	Start feeling in control
+
+Secondary goal
+
+Показать жюри и любому посетителю, что:
+	•	продукт premium
+	•	продукт отличается от конкурентов
+	•	продукт выглядит как реальный venture-scale startup
+	•	у него сильная emotional + functional value proposition
+
+⸻
+
+5. Целевая визуальная стратегия
+
+Базовый визуальный принцип
+
+На первом экране и на протяжении почти всего сайта главным героем остается iPhone mockup с интерфейсом Preggo.
+
+Идея:
+	•	телефон — центр сцены
+	•	вокруг него живут данные, свет, сигналы, анимации
+	•	по мере скролла телефон:
+	•	увеличивается
+	•	приближается
+	•	UI раскрывается
+	•	уходит на второй план
+	•	возвращается в финале
+
+Важный принцип
+
+Сайт должен быть не “много карточек и текста”, а sequenced visual storytelling.
+
+⸻
+
+6. Структура страницы
+
+Секция 1. Hero / Opening Scene
+
+Что должно быть
+	•	fullscreen hero
+	•	светлый премиальный градиентный фон
+	•	по центру iPhone mockup
+	•	в телефоне — UI Preggo с heartbeat / risk alert / clean dashboard
+	•	сверху очень минимальная навигация
+
+Контент
+
+Большой headline:
+Know earlier. Worry less.
+
+Подзаголовок:
+Preggo uses continuous AI monitoring, risk detection, and doctor-ready insights to help you understand what’s happening with your body.
+
+Primary CTA:
+Get early access
+
+Secondary supporting microcopy:
+Takes 30 seconds to start
+
+Анимация
+
+При первом экране:
+	•	телефон плавно появляется через fade + slight scale
+	•	фон живой, но очень subtle
+	•	вокруг телефона появляются мягкие flowing light trails
+	•	в самом UI есть легкое micro-motion: heartbeat line, gentle pulse, small UI glow
+	•	headline может появляться по строкам или по словам
+
+Ощущение
+
+Сразу должно быть понятно:
+это не контентный лендинг, это premium product reveal
+
+⸻
+
+Секция 2. Uncertainty / Pain Scene
+
+Смысл
+
+Показать эмоциональную боль беременности:
+	•	тревога
+	•	хаос
+	•	много данных
+	•	мало ясности
+
+Визуал
+
+При скролле iPhone слегка zoom-in, потом вокруг него или вместо него появляются слои:
+	•	fragmented search queries
+	•	scattered symptom notes
+	•	blurred lab results
+	•	floating question fragments
+
+Примеры текста в воздухе:
+	•	Is this normal?
+	•	Should I worry?
+	•	Am I missing something?
+	•	What does this result mean?
+
+Контент
+
+Headline:
+Pregnancy shouldn’t feel like guessing.
+
+Support text:
+Between doctor visits, most women are left with questions, scattered data, and no clear interpretation.
+
+Анимация
+	•	появляется controlled chaos
+	•	элементы не должны быть ugly; это красивый, premium chaos
+	•	floating cards, blurred panels, layered motion
+	•	можно добавить slight parallax
+	•	потом весь хаос буквально стягивается в центр и собирается в систему
+
+⸻
+
+Секция 3. Transition to Clarity
+
+Смысл
+
+Ключевой момент transformation:
+хаос превращается в одну ясную картину
+
+Контент
+
+Headline:
+From scattered signals to one clear picture.
+
+Визуал
+	•	fragmented UI fragments собираются в clean central dashboard
+	•	document snippets, graph lines, symptom data, wearable metrics сливаются в одну панель
+	•	фон становится чище, светлее, спокойнее
+
+Анимация
+
+Это должна быть одна из самых красивых сцен:
+	•	particles / lines / cards converging
+	•	morph animation
+	•	light trails gather into interface
+	•	blur → sharp focus transition
+
+⸻
+
+Секция 4. Product Reveal / Safety System
+
+Смысл
+
+Сформулировать продукт максимально сильно
+
+Контент
+
+Headline:
+This is not a pregnancy app.
+This is a safety system.
+
+Короткий supporting text:
+Preggo combines continuous monitoring, AI interpretation, document scanning, alerts, and doctor-ready reports into one intelligent workflow.
+
+Визуал
+	•	clean large section
+	•	iPhone + floating feature callouts
+	•	UI очень чистый и дорогой
+	•	callouts появляются по одному
+
+Анимация
+	•	feature labels fade/slide in
+	•	UI hotspots glow when mentioned
+	•	subtle device rotation/parallax on scroll
+
+⸻
+
+Секция 5. Feature Sequence (Apple-style product chapters)
+
+Эта часть должна идти как серия cinematic сцен.
+Каждая фича = отдельный мини-экран.
+
+5.1 Continuous Monitoring
+
+Контент
+
+Always watching. Quietly.
+
+Short text:
+Wearable data, patterns, and signals — continuously organized without manual overload.
+
+Визуал
+	•	heartbeat line
+	•	sleep / HRV / activity-inspired metrics
+	•	soft moving waveform
+	•	clean medical-tech dashboard
+
+Анимация
+	•	live graph movement
+	•	pulsing line
+	•	subtle particles moving through data paths
+
+⸻
+
+5.2 AI Risk Detection
+
+Контент
+
+Know earlier. Not later.
+
+Short text:
+Preggo helps surface patterns and signals that deserve attention before uncertainty turns into panic.
+
+Визуал
+	•	risk score panel
+	•	alert card
+	•	emphasis glow around important metric
+
+Анимация
+	•	score changes
+	•	alert softly emerges
+	•	not red panic horror, but calm controlled warning
+
+⸻
+
+5.3 Lab & Document Scanner
+
+Контент
+
+No more guessing test results.
+
+Short text:
+Scan reports, extract the important parts, and turn medical documents into understandable insight.
+
+Визуал
+	•	document card
+	•	scan beam / scan line
+	•	extracted values
+	•	highlighted important info
+
+Анимация
+	•	document slides in
+	•	scanning sweep passes across page
+	•	key values highlight one by one
+
+⸻
+
+5.4 Doctor-ready Reports
+
+Контент
+
+Walk into appointments prepared.
+
+Short text:
+Bring one clear, organized story of your pregnancy to every doctor visit.
+
+Визуал
+	•	report assembling itself
+	•	charts + timeline + summary card
+	•	clean “exportable” report UI
+
+Анимация
+	•	report builds itself section by section
+	•	panels snap into place
+	•	final report card locks in elegantly
+
+⸻
+
+Секция 6. Emotional Peak
+
+Смысл
+
+После функциональной части дать эмоциональный payoff
+
+Контент
+
+Headline:
+For the first time,
+you feel in control.
+
+Support text:
+Less noise. Less panic. More clarity around what matters.
+
+Визуал
+	•	самый спокойный и светлый экран
+	•	минимализм
+	•	soft glow
+	•	reduced motion
+	•	можно оставить один красивый phone shot + light halo
+
+Анимация
+	•	everything slows down
+	•	motion reduces
+	•	background light breathes softly
+	•	typography appears slowly and confidently
+
+⸻
+
+Секция 7. Pricing / Premium Positioning
+
+Смысл
+
+Подать цену не как цену, а как рациональную premium investment
+
+Контент
+
+Main:
+$159 / year
+
+Sub:
+Less than one doctor visit.
+More clarity throughout your pregnancy.
+
+CTA:
+Join beta
+
+Визуал
+	•	ultra-minimal
+	•	центрированный блок
+	•	много воздуха
+	•	без дешевых тарифных карточек
+
+Анимация
+	•	simple fade
+	•	maybe number count-up
+	•	no aggressive sales gimmicks
+
+⸻
+
+Секция 8. Final CTA / Closing Scene
+
+Смысл
+
+Самый сильный завершающий экран
+
+Контент
+
+Headline:
+You can’t control everything.
+But you can understand.
+
+Subtext:
+Preggo helps turn uncertainty into clarity — through monitoring, interpretation, and calm, actionable insight.
+
+Final CTA:
+Start your pregnancy with clarity
+
+Визуал
+	•	darker cinematic background or rich twilight gradient
+	•	central phone or logo + soft neural light trails
+	•	premium final frame, almost ad-like
+
+Анимация
+	•	light trails slowly orbit
+	•	CTA glows subtly
+	•	entire page resolves into a confident ending
+
+⸻
+
+7. Навигация
+
+Требования
+	•	минимальная
+	•	premium
+	•	почти незаметная
+	•	sticky / floating
+	•	прозрачная или semi-translucent
+	•	по стилю ближе к glass / liquid overlay
+
+Пункты
+	•	Features
+	•	How it works
+	•	Pricing
+	•	Join beta
+
+Поведение
+	•	initially almost invisible
+	•	on scroll becomes a compact translucent bar
+	•	smooth blur background
+	•	no hard borders
+
+Это хорошо сочетается с Apple-подобным использованием полупрозрачных layered surfaces и compact transitions.  ￼
+
+⸻
+
+8. Визуальный язык
+
+Цвета
+
+Основа:
+	•	soft white
+	•	warm blush / coral pink
+	•	gentle lavender
+	•	soft medical blue
+	•	occasional deep navy for premium contrast
+
+Не использовать
+	•	яркий детский pink
+	•	childish pregnancy palette
+	•	cartoon visuals
+	•	overly feminine clichés
+
+Ощущение палитры
+
+“calm intelligence”
+
+⸻
+
+9. Типографика
+
+Стиль
+	•	очень крупные заголовки
+	•	мало текста
+	•	один главный message на экран
+	•	typography-driven layout
+	•	wide spacing
+	•	premium rhythm
+
+Рекомендации
+	•	Inter
+	•	SF Pro-like feel
+	•	Geist допустимо
+	•	Manrope допустимо, если аккуратно
+	•	лучше что-то очень чистое и современное
+
+⸻
+
+10. Нужные картинки и ассеты
+
+Обязательно подготовить
+	1.	Главный iPhone mockup
+	•	чистый, фронтальный
+	•	premium render
+	•	high-res
+	•	прозрачный фон желательно
+	2.	UI screens Preggo
+Нужны минимум 4–5 красивых экрана:
+	•	main monitoring dashboard
+	•	risk alert screen
+	•	symptoms / insights screen
+	•	lab scan screen
+	•	doctor report screen
+	3.	Floating UI fragments
+	•	small glass cards
+	•	metric cards
+	•	tiny graph cards
+	•	alert chips
+	•	scan result snippets
+	4.	Document scan visual
+	•	красивый медицинский документ / анализ
+	•	stylized, not realistic ugly PDF screenshot
+	5.	Background light assets
+	•	glowing lines
+	•	particles
+	•	subtle lens glow
+	•	abstract neural / data flow shapes
+	6.	Logo usage
+	•	main logo in navbar
+	•	optional ending logo lockup
+
+⸻
+
+11. Анимации: обязательные
+
+Scroll-driven
+
+Нужна полноценная scroll-based animation architecture.
+
+Обязательные эффекты
+	1.	hero fade + scale in
+	2.	phone zoom in on scroll
+	3.	parallax layers
+	4.	blur-to-focus transitions
+	5.	UI cards entering with stagger
+	6.	floating light trails
+	7.	section pinning for at least hero + feature reveal
+	8.	document scanning animation
+	9.	morph / converge transition from chaos to clarity
+	10.	final CTA cinematic fade
+
+Motion principles
+	•	smooth
+	•	expensive
+	•	restrained
+	•	no cheap bouncy motion
+	•	no gimmicky overanimation
+	•	motion should feel engineered, not playful
+
+⸻
+
+12. Технический стек и библиотеки
+
+Предпочтительный стек
+	•	Next.js
+	•	React
+	•	TypeScript
+	•	Tailwind CSS
+
+Для анимаций
+
+Использовать по максимуму мощные инструменты:
+	•	GSAP
+	•	ScrollTrigger
+	•	Framer Motion
+	•	Lenis для smooth scroll
+	•	React Three Fiber при необходимости для одного hero-level 3D/lighting effect
+	•	Spline можно использовать, если удобно для 3D scene / phone presentation
+	•	Motion One можно как вспомогательное, но основной стек лучше GSAP + Framer Motion
+	•	Lottie только если очень нужно для отдельных controlled animations, но лучше избегать ощущения шаблонности
+
+Рекомендованный подход
+	•	GSAP + ScrollTrigger = основной scroll storytelling
+	•	Framer Motion = micro-interactions / section reveals
+	•	Lenis = smooth premium scrolling
+	•	Tailwind = layout speed
+	•	optional R3F = subtle 3D phone/parallax light scene
+
+⸻
+
+13. UX-принципы
+
+Главное
+	•	сайт должен быть визуально мощным, но понятным
+	•	пользователь не должен теряться
+	•	каждая секция = одна мысль
+	•	скролл должен вести за руку
+	•	не перегружать десятью карточками сразу
+	•	весь опыт должен ощущаться clean and inevitable
+
+Мобильная адаптация
+
+Важно:
+	•	desktop = полный cinematic experience
+	•	mobile = упрощенная, но тоже дорогая версия
+	•	не ломать scroll storytelling на телефоне
+	•	на mobile можно:
+	•	уменьшить количество pinned scenes
+	•	упростить parallax
+	•	оставить key transitions
+
+⸻
+
+14. Что нельзя делать
+	•	не делать обычный SaaS landing с сеткой из 20 карточек
+	•	не делать “cute pregnancy app”
+	•	не делать dribbble-ради-dribbble
+	•	не делать кислотный glow everywhere
+	•	не делать дешевый gradient spam
+	•	не делать перегруженный copy
+	•	не делать длинные простыни текста
+	•	не делать прямую копию Apple, а именно перенести принципы
+
+⸻
+
+15. Итоговое ощущение, которое должно остаться
+
+После просмотра страницы человек должен подумать:
+	•	“это выглядит как реальный дорогой продукт”
+	•	“это не просто трекер”
+	•	“это помогает чувствовать контроль”
+	•	“это современно, технологично и спокойно”
+	•	“я бы поверил, что это venture-backed startup”
+	•	“это premium confidence platform for pregnancy”
+
+⸻
+
+16. Финальный output от Claude, который нужен
+
+Попроси Claude на основе этого ТЗ сделать:
+	1.	полную архитектуру страницы по секциям
+	2.	компонентный план для React / Next.js
+	3.	анимационный план по каждой секции
+	4.	список нужных ассетов
+	5.	структуру файлов проекта
+	6.	поэтапный implementation roadmap
+	7.	потом уже сам код
