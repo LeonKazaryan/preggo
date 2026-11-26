@@ -38,7 +38,9 @@ final class HealthViewModel {
         if appState?.isDemoMode == true {
             let demo = HealthKitManager.loadDemoData()
             bioMarkers = demo
-            try? await FirebaseService.shared.saveBioMarkers(demo)
+            // Fire-and-forget: Firestore only resolves after the server acks, which
+            // would keep the loading state up while offline.
+            Task { try? await FirebaseService.shared.saveBioMarkers(demo) }
             return
         }
 
@@ -46,7 +48,7 @@ final class HealthViewModel {
             try await HealthKitManager.shared.requestPermissions()
             let markers = try await HealthKitManager.shared.fetchTodayBioMarkers()
             bioMarkers = markers
-            try await FirebaseService.shared.saveBioMarkers(markers)
+            Task { try? await FirebaseService.shared.saveBioMarkers(markers) }
         } catch let error as HealthKitError {
             errorMessage = error.errorDescription
         } catch {
@@ -81,10 +83,12 @@ final class HealthViewModel {
             appState?.lastAnalysisDate = Date()
             appState?.lastAnalysisDocumentCount = documentImages.count
 
-            try? await FirebaseService.shared.saveAnalysis(
-                analysis,
-                gestationalWeek: profile.gestationalWeek
-            )
+            Task {
+                try? await FirebaseService.shared.saveAnalysis(
+                    analysis,
+                    gestationalWeek: profile.gestationalWeek
+                )
+            }
         } catch {
             errorMessage = "AI analysis failed: \(error.localizedDescription)"
         }

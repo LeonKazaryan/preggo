@@ -22,5 +22,6 @@ build/
 
 # Keys (add your own locally, never commit)
 GoogleService-Info.plist
+Secrets.plist
 .env
 .env*.local

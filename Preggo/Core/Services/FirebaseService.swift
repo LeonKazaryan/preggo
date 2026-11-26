@@ -3,9 +3,12 @@
 //  Preggo
 //
 //  Firestore persistence layer for bio-markers and AI analysis history.
+//  Writes go under users/{uid} where uid comes from Firebase anonymous auth.
+//  If Firebase is not configured (no GoogleService-Info.plist), every call is a no-op.
 //
 
 import Foundation
+import FirebaseCore
 import FirebaseFirestore
 import FirebaseAuth
 
@@ -16,13 +19,16 @@ final class FirebaseService {
     static let shared = FirebaseService()
     private init() {}
 
-    private let db = Firestore.firestore()
-    private let anonymousUIDKey = "preggo.anonymous.uid"
+    /// True when FirebaseApp.configure() ran (GoogleService-Info.plist is in the bundle).
+    static var isConfigured: Bool { FirebaseApp.app() != nil }
+
+    private var db: Firestore { Firestore.firestore() }
 
     // MARK: - Bio-Markers
 
     func saveBioMarkers(_ data: BioMarkerData) async throws {
-        let uid = try currentUID()
+        guard Self.isConfigured else { return }
+        let uid = try await currentUID()
         let payload = try encodeToDictionary(data)
         try await db.collection("users").document(uid).collection("biomarkers").addDocument(data: payload)
     }
@@ -30,7 +36,8 @@ final class FirebaseService {
     // MARK: - AI Analysis History
 
     func saveAnalysis(_ result: AIAnalysisResult, gestationalWeek: Int) async throws {
-        let uid = try currentUID()
+        guard Self.isConfigured else { return }
+        let uid = try await currentUID()
         let payload: [String: Any] = [
             "riskLevel":            result.riskLevel.rawValue,
             "personalizedMessage":  result.personalizedMessage,
@@ -48,13 +55,10 @@ final class FirebaseService {
 
     // MARK: - Helpers
 
-    func currentUID() throws -> String {
+    /// Signs in anonymously on first use so Firestore rules can require request.auth.uid == uid.
+    func currentUID() async throws -> String {
         if let uid = Auth.auth().currentUser?.uid { return uid }
-        let defaults = UserDefaults.standard
-        if let existing = defaults.string(forKey: anonymousUIDKey) { return existing }
-        let new = UUID().uuidString
-        defaults.set(new, forKey: anonymousUIDKey)
-        return new
+        return try await Auth.auth().signInAnonymously().user.uid
     }
 
     private func encodeToDictionary<T: Encodable>(_ value: T) throws -> [String: Any] {

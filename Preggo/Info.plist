@@ -8,5 +8,7 @@
 	<string>Preggo may write analysis results to your Health data.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Preggo scans your lab reports to extract results automatically.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

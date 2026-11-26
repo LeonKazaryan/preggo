@@ -8,7 +8,8 @@
 //  Images are sent as inline base64 JPEG data so Gemini can read lab reports
 //  directly — no OCR regex parsing needed.
 //
-//  API key fetched at runtime from Firebase Remote Config.
+//  API key fetched at runtime from Firebase Remote Config, falling back to
+//  a local Preggo/Secrets.plist (gitignored) with a GEMINI_API_KEY entry.
 //
 
 import Foundation
@@ -43,7 +44,7 @@ enum AnalysisError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .missingAPIKey:
-            return "Gemini API key not found. Set GEMINI_API_KEY in Firebase Remote Config."
+            return "Gemini API key not found. Set GEMINI_API_KEY in Firebase Remote Config or Preggo/Secrets.plist."
         case .httpError(let code):
             return "Gemini API returned HTTP \(code). Check your API key and quota."
         case .emptyResponse:
@@ -59,7 +60,8 @@ final class AnalysisEngine {
     static let shared = AnalysisEngine()
     private init() {}
 
-    private let endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
+    // "-latest" alias: gemini-2.5-flash is rerouted to a Flash-Lite model from 2026-12-01.
+    private let endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent"
 
     // MARK: - Public API
 
@@ -73,23 +75,19 @@ final class AnalysisEngine {
         profile: PatientProfile
     ) async throws -> AIAnalysisResult {
 
-        // Fetch API key from Remote Config.
-        let rc = RemoteConfig.remoteConfig()
-        let rcSettings = RemoteConfigSettings()
-        rcSettings.minimumFetchInterval = 3600
-        rc.configSettings = rcSettings
-        try await rc.fetchAndActivate()
-        let apiKey = rc.configValue(forKey: "GEMINI_API_KEY").stringValue
+        let apiKey = await resolveAPIKey()
         guard !apiKey.isEmpty else { throw AnalysisError.missingAPIKey }
 
         let prompt = buildPrompt(bioMarkers: bioMarkers, profile: profile, imageCount: documentImages.count)
 
-        guard let url = URL(string: "\(endpoint)?key=\(apiKey)") else {
+        guard let url = URL(string: endpoint) else {
             throw AnalysisError.missingAPIKey
         }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
+        request.timeoutInterval = 120
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(apiKey, forHTTPHeaderField: "x-goog-api-key")
 
         // Build multimodal parts: text prompt + optional image parts.
         var parts: [[String: Any]] = [["text": prompt]]
@@ -112,7 +110,8 @@ final class AnalysisEngine {
             ],
             "generationConfig": [
                 "temperature": 0.2,
-                "maxOutputTokens": 3000,
+                // Thinking tokens count toward this limit; 3000 could cut the JSON off.
+                "maxOutputTokens": 8192,
                 "responseMimeType": "application/json"
             ]
         ]
@@ -128,13 +127,44 @@ final class AnalysisEngine {
         }
 
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-        let text = (((json?["candidates"] as? [[String: Any]])?.first?["content"]
-            as? [String: Any])?["parts"] as? [[String: Any]])?.first?["text"] as? String ?? ""
+        let responseParts = ((json?["candidates"] as? [[String: Any]])?.first?["content"]
+            as? [String: Any])?["parts"] as? [[String: Any]] ?? []
+        // Skip thought-summary parts; join the answer text.
+        let text = responseParts
+            .filter { ($0["thought"] as? Bool) != true }
+            .compactMap { $0["text"] as? String }
+            .joined()
 
         guard !text.isEmpty else { throw AnalysisError.emptyResponse }
         print("🤖 AnalysisEngine response: \(text.prefix(500))")
 
         return parseResponse(text)
+    }
+
+    // MARK: - API Key
+
+    /// Remote Config first (lets the key change without a new build), then Secrets.plist.
+    private func resolveAPIKey() async -> String {
+        if FirebaseService.isConfigured {
+            let rc = RemoteConfig.remoteConfig()
+            let rcSettings = RemoteConfigSettings()
+            #if DEBUG
+            rcSettings.minimumFetchInterval = 0
+            #else
+            rcSettings.minimumFetchInterval = 3600
+            #endif
+            rc.configSettings = rcSettings
+            _ = try? await rc.fetchAndActivate()
+            let key = rc.configValue(forKey: "GEMINI_API_KEY").stringValue
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            if !key.isEmpty { return key }
+        }
+
+        guard let url = Bundle.main.url(forResource: "Secrets", withExtension: "plist"),
+              let dict = NSDictionary(contentsOf: url) as? [String: Any],
+              let key = dict["GEMINI_API_KEY"] as? String
+        else { return "" }
+        return key.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     // MARK: - System Instruction
