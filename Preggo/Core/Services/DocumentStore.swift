@@ -66,7 +66,7 @@ final class DocumentStore {
         return UIImage(data: data)
     }
 
-    /// Returns JPEG data for all documents (for Gemini multimodal API).
+    /// Returns JPEG data for all documents (for the multimodal AI request).
     /// Limited to the most recent N documents, compressed for API payload.
     func imageDataForAnalysis(limit: Int = 5) -> [Data] {
         let recent = documents.prefix(limit)

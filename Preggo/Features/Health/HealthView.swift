@@ -19,18 +19,28 @@ struct HealthView: View {
             ZStack(alignment: .top) {
                 Color.preggoSurface.ignoresSafeArea()
 
-                ScrollView {
-                    VStack(spacing: 16) {
-                        BioMarkersCard(vm: vm)
-                        AIInsightCard(vm: vm)
-                        if let analysis = vm.aiAnalysis,
-                           !analysis.extractedLabValues.isEmpty {
-                            ExtractedLabValuesCard(analysis: analysis)
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        VStack(spacing: 16) {
+                            BioMarkersCard(vm: vm)
+                            AIInsightCard(vm: vm)
+                                .id("aiCard")
+                            if let analysis = vm.aiAnalysis,
+                               !analysis.extractedLabValues.isEmpty {
+                                ExtractedLabValuesCard(analysis: analysis)
+                            }
+                            Color.clear.frame(height: 20)
                         }
-                        Color.clear.frame(height: 20)
+                        .padding(.horizontal, 16)
+                        .padding(.top, 8)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 8)
+                    // Bring the AI card into view so the loading state is visible right away.
+                    .onChange(of: vm.isLoadingAI) { _, loading in
+                        guard loading else { return }
+                        withAnimation(.easeInOut(duration: 0.4)) {
+                            proxy.scrollTo("aiCard", anchor: .top)
+                        }
+                    }
                 }
 
                 if let message = vm.errorMessage {
@@ -152,16 +162,24 @@ struct BioMarkersCard: View {
                 Button {
                     Task { await vm.runAIAnalysis() }
                 } label: {
-                    HStack {
-                        Image(systemName: "waveform.and.magnifyingglass")
-                        Text("Run AI Analysis")
-                            .fontWeight(.semibold)
+                    HStack(spacing: 8) {
+                        if vm.isLoadingAI {
+                            ProgressView()
+                                .tint(.white)
+                            Text("Analyzing…")
+                                .fontWeight(.semibold)
+                        } else {
+                            Image(systemName: "waveform.and.magnifyingglass")
+                            Text("Run AI Analysis")
+                                .fontWeight(.semibold)
+                        }
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
-                    .background(Color.preggoNavy)
+                    .background(Color.preggoNavy.opacity(vm.isLoadingAI ? 0.55 : 1))
                     .foregroundStyle(.white)
                     .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    .animation(.easeInOut(duration: 0.2), value: vm.isLoadingAI)
                 }
                 .disabled(vm.isLoadingAI)
             }
@@ -249,7 +267,7 @@ struct AIInsightCard: View {
                     .font(.preggoHeadline)
                     .foregroundStyle(Color.preggoNavy)
                 Spacer()
-                Text("Gemini 2.5 Flash")
+                Text("Grok")
                     .font(.preggoCaption)
                     .foregroundStyle(Color.preggoNavy.opacity(0.7))
                     .padding(.horizontal, 8)
@@ -261,7 +279,7 @@ struct AIInsightCard: View {
             Divider().background(Color.preggoNavy.opacity(0.08))
 
             if vm.isLoadingAI {
-                aiLoadingSkeleton
+                AIAnalyzingView()
             } else if let analysis = vm.aiAnalysis {
                 PersonalizedMessageBanner(message: analysis.personalizedMessage, riskLevel: analysis.riskLevel)
 
@@ -269,6 +287,8 @@ struct AIInsightCard: View {
 
                 RiskGaugeView(riskLevel: analysis.riskLevel)
                     .frame(height: 130)
+
+                ConfidenceIndexView(score: analysis.confidenceScore)
 
                 Divider().background(Color.preggoNavy.opacity(0.06))
 
@@ -326,17 +346,6 @@ struct AIInsightCard: View {
         .cardStyle()
     }
 
-    private var aiLoadingSkeleton: some View {
-        VStack(spacing: 8) {
-            ForEach(0..<4, id: \.self) { _ in
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(Color.preggoMuted.opacity(0.15))
-                    .frame(height: 14)
-                    .shimmering()
-            }
-        }
-    }
-
     private func sectionHeader(icon: String, title: String) -> some View {
         HStack(spacing: 6) {
             Image(systemName: icon)
@@ -346,6 +355,118 @@ struct AIInsightCard: View {
                 .font(.system(size: 10, weight: .semibold))
                 .kerning(1.5)
                 .foregroundStyle(Color.preggoNavy.opacity(0.5))
+        }
+    }
+}
+
+// MARK: - AI Analyzing View
+
+/// Loading state for the AI card: spinning ring, pulsing icon and step captions.
+/// Everything is derived from TimelineView time, so no repeatForever animation state leaks out.
+struct AIAnalyzingView: View {
+    @State private var start = Date()
+
+    private let steps = [
+        "Reading your bio-markers…",
+        "Scanning your lab reports…",
+        "Correlating risk factors…",
+        "Writing your personal summary…"
+    ]
+    private let stepDuration = 2.5
+
+    var body: some View {
+        TimelineView(.animation) { context in
+            let elapsed = context.date.timeIntervalSince(start)
+            let step = min(Int(elapsed / stepDuration), steps.count - 1)
+            let angle = (elapsed.truncatingRemainder(dividingBy: 1.2) / 1.2) * 360
+            let pulse = 1 + 0.08 * sin(elapsed * 3)
+
+            VStack(spacing: 16) {
+                ZStack {
+                    Circle()
+                        .stroke(Color.preggoRose.opacity(0.15), lineWidth: 6)
+                    Circle()
+                        .trim(from: 0, to: 0.3)
+                        .stroke(Color.preggoRose, style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                        .rotationEffect(.degrees(angle))
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 26, weight: .semibold))
+                        .foregroundStyle(Color.preggoRose)
+                        .scaleEffect(pulse)
+                }
+                .frame(width: 72, height: 72)
+
+                Text(steps[step])
+                    .font(.preggoBody)
+                    .foregroundStyle(Color.preggoNavy)
+                    .id(step)
+                    .transition(.opacity)
+
+                HStack(spacing: 6) {
+                    ForEach(steps.indices, id: \.self) { i in
+                        Capsule()
+                            .fill(i <= step ? Color.preggoRose : Color.preggoMuted.opacity(0.2))
+                            .frame(width: i == step ? 18 : 6, height: 6)
+                    }
+                }
+
+                Text("This usually takes a few seconds")
+                    .font(.preggoCaption)
+                    .foregroundStyle(Color.preggoMuted)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .animation(.easeInOut(duration: 0.35), value: step)
+        }
+    }
+}
+
+// MARK: - Confidence Index
+
+/// 0–100 score from the model: how much it trusts its own assessment given the data it had.
+struct ConfidenceIndexView: View {
+    let score: Int
+
+    private var color: Color {
+        switch score {
+        case 75...:   return .preggoSuccess
+        case 50..<75: return .preggoWarning
+        default:      return Color(hex: "#E05252")
+        }
+    }
+
+    private var caption: String {
+        switch score {
+        case 75...:   return "High — enough data for a reliable assessment."
+        case 50..<75: return "Medium — some data is missing. Scan lab reports for a sharper read."
+        default:      return "Low — add Health data or scan lab reports and run again."
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Label("AI Confidence Index", systemImage: "checkmark.seal")
+                    .font(.preggoCaption)
+                    .foregroundStyle(Color.preggoNavy.opacity(0.7))
+                Spacer()
+                Text("\(score)%")
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .foregroundStyle(color)
+            }
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule().fill(Color.preggoNavy.opacity(0.08))
+                    Capsule()
+                        .fill(color)
+                        .frame(width: geo.size.width * CGFloat(score) / 100)
+                }
+            }
+            .frame(height: 8)
+            Text(caption)
+                .font(.preggoCaption)
+                .foregroundStyle(Color.preggoMuted)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }
@@ -602,6 +723,8 @@ struct HealthReportSnapshot: View {
             if let analysis = vm.aiAnalysis {
                 RiskGaugeView(riskLevel: analysis.riskLevel)
                     .frame(height: 130)
+
+                ConfidenceIndexView(score: analysis.confidenceScore)
                     .padding(.horizontal, 20)
 
                 Divider()
@@ -738,28 +861,19 @@ struct ShareSheet: UIViewControllerRepresentable {
 
 // MARK: - Shimmer
 
+/// Opacity pulse instead of a sliding gradient: a repeatForever offset inside a
+/// GeometryReader kept geometry animating and flooded the console on iOS 26+.
 struct ShimmerModifier: ViewModifier {
-    @State private var phase: CGFloat = -1
+    @State private var dimmed = false
 
     func body(content: Content) -> some View {
-        content.overlay(
-            GeometryReader { geo in
-                LinearGradient(
-                    gradient: Gradient(stops: [
-                        .init(color: .clear, location: 0),
-                        .init(color: Color.white.opacity(0.4), location: 0.4),
-                        .init(color: .clear, location: 0.8),
-                    ]),
-                    startPoint: .leading,
-                    endPoint: .trailing
-                )
-                .frame(width: geo.size.width * 2)
-                .offset(x: geo.size.width * phase)
-                .animation(.linear(duration: 1.4).repeatForever(autoreverses: false), value: phase)
-                .onAppear { phase = 1.5 }
+        content
+            .opacity(dimmed ? 0.4 : 1)
+            .onAppear {
+                withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
+                    dimmed = true
+                }
             }
-            .clipped()
-        )
     }
 }
 

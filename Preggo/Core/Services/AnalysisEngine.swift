@@ -2,18 +2,16 @@
 //  AnalysisEngine.swift
 //  Preggo
 //
-//  Clinical AI analysis engine — calls Gemini 2.5 Flash with multimodal
-//  input: structured patient data + scanned document images.
+//  Clinical AI analysis engine — calls xAI Grok (OpenAI-compatible chat API)
+//  with multimodal input: structured patient data + scanned document images.
 //
-//  Images are sent as inline base64 JPEG data so Gemini can read lab reports
-//  directly — no OCR regex parsing needed.
+//  Images are sent as inline base64 JPEG data URLs so the model can read lab
+//  reports directly — no OCR regex parsing needed.
 //
-//  API key fetched at runtime from Firebase Remote Config, falling back to
-//  a local Preggo/Secrets.plist (gitignored) with a GEMINI_API_KEY entry.
+//  API key read from Preggo/Secrets.plist (gitignored), XAI_API_KEY entry.
 //
 
 import Foundation
-import FirebaseRemoteConfig
 
 // MARK: - AIAnalysisResult
 
@@ -29,9 +27,12 @@ struct AIAnalysisResult {
     let doctorTalkingPoints: [String]
     let actionItems: [String]
     let flaggedMarkers: [String]
-    /// Lab values extracted by Gemini from scanned document images.
+    /// Lab values extracted by the model from scanned document images.
     let extractedLabValues: [String: String]
-    let isLowConfidence: Bool
+    /// 0–100: how confident the model is in this assessment, given data completeness and quality.
+    let confidenceScore: Int
+
+    var isLowConfidence: Bool { confidenceScore < 50 }
 }
 
 // MARK: - AnalysisError
@@ -44,9 +45,9 @@ enum AnalysisError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .missingAPIKey:
-            return "Gemini API key not found. Set GEMINI_API_KEY in Firebase Remote Config or Preggo/Secrets.plist."
+            return "AI API key not found. Set XAI_API_KEY in Preggo/Secrets.plist."
         case .httpError(let code):
-            return "Gemini API returned HTTP \(code). Check your API key and quota."
+            return "AI service returned HTTP \(code). Check your API key and balance."
         case .emptyResponse:
             return "The AI returned an empty response. Please try again."
         }
@@ -60,80 +61,81 @@ final class AnalysisEngine {
     static let shared = AnalysisEngine()
     private init() {}
 
-    // "-latest" alias: gemini-2.5-flash is rerouted to a Flash-Lite model from 2026-12-01.
-    private let endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent"
+    // Cheapest vision-capable Grok models; non-reasoning spends no thinking tokens.
+    // Tried in order; on overload, rate limit, a missing model or a timeout the next one is used.
+    private let models = ["grok-4.20-non-reasoning", "grok-4.3"]
+    private let endpoint = "https://api.x.ai/v1/chat/completions"
 
     // MARK: - Public API
 
     /// Analyzes maternal risk using bio-markers, scanned document images, and patient profile.
     ///
-    /// Document images are sent directly to Gemini's multimodal API as base64 JPEG data.
-    /// Gemini extracts lab values from the images and correlates them with bio-markers.
+    /// Document images are sent directly to the model as base64 JPEG data URLs.
+    /// The model extracts lab values from the images and correlates them with bio-markers.
     func analyzeRisk(
         bioMarkers: BioMarkerData,
         documentImages: [Data],
         profile: PatientProfile
     ) async throws -> AIAnalysisResult {
 
-        let apiKey = await resolveAPIKey()
+        let apiKey = resolveAPIKey()
         guard !apiKey.isEmpty else { throw AnalysisError.missingAPIKey }
+        guard let url = URL(string: endpoint) else { throw AnalysisError.missingAPIKey }
 
         let prompt = buildPrompt(bioMarkers: bioMarkers, profile: profile, imageCount: documentImages.count)
 
-        guard let url = URL(string: endpoint) else {
-            throw AnalysisError.missingAPIKey
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.timeoutInterval = 120
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue(apiKey, forHTTPHeaderField: "x-goog-api-key")
-
-        // Build multimodal parts: text prompt + optional image parts.
-        var parts: [[String: Any]] = [["text": prompt]]
+        // Multimodal user content: text prompt + optional image parts.
+        var content: [[String: Any]] = [["type": "text", "text": prompt]]
         for imageData in documentImages.prefix(5) {
-            let base64 = imageData.base64EncodedString()
-            parts.append([
-                "inlineData": [
-                    "mimeType": "image/jpeg",
-                    "data": base64
+            content.append([
+                "type": "image_url",
+                "image_url": [
+                    "url": "data:image/jpeg;base64,\(imageData.base64EncodedString())",
+                    "detail": "high"
                 ]
             ])
         }
 
-        let body: [String: Any] = [
-            "system_instruction": [
-                "parts": [["text": systemInstruction]]
-            ],
-            "contents": [
-                ["parts": parts]
-            ],
-            "generationConfig": [
+        var data = Data()
+        var statusCode = 0
+        for model in models {
+            let body: [String: Any] = [
+                "model": model,
+                "messages": [
+                    ["role": "system", "content": systemInstruction],
+                    ["role": "user", "content": content]
+                ],
                 "temperature": 0.2,
-                // Thinking tokens count toward this limit; 3000 could cut the JSON off.
-                "maxOutputTokens": 8192,
-                "responseMimeType": "application/json"
+                "max_tokens": 3000,
+                "response_format": ["type": "json_object"]
             ]
-        ]
 
-        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            request.timeoutInterval = 60
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+            request.httpBody = try JSONSerialization.data(withJSONObject: body)
 
-        let (data, response) = try await URLSession.shared.data(for: request)
-        let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
-        guard statusCode == 200 else {
+            do {
+                let (responseData, response) = try await URLSession.shared.data(for: request)
+                data = responseData
+                statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
+            } catch let error as URLError where error.code == .timedOut {
+                print("❌ AnalysisEngine \(model) timed out")
+                statusCode = 408
+                continue
+            }
+            if statusCode == 200 { break }
             let bodyStr = String(data: data, encoding: .utf8) ?? ""
-            print("❌ AnalysisEngine HTTP \(statusCode): \(bodyStr.prefix(300))")
-            throw AnalysisError.httpError(statusCode)
+            print("❌ AnalysisEngine \(model) HTTP \(statusCode): \(bodyStr.prefix(300))")
+            guard [404, 408, 429, 500, 502, 503].contains(statusCode) else { break }
         }
+        guard statusCode == 200 else { throw AnalysisError.httpError(statusCode) }
 
         let json = try JSONSerialization.jsonObject(with: data) as? [String: Any]
-        let responseParts = ((json?["candidates"] as? [[String: Any]])?.first?["content"]
-            as? [String: Any])?["parts"] as? [[String: Any]] ?? []
-        // Skip thought-summary parts; join the answer text.
-        let text = responseParts
-            .filter { ($0["thought"] as? Bool) != true }
-            .compactMap { $0["text"] as? String }
-            .joined()
+        let text = (((json?["choices"] as? [[String: Any]])?.first?["message"]
+            as? [String: Any])?["content"] as? String) ?? ""
 
         guard !text.isEmpty else { throw AnalysisError.emptyResponse }
         print("🤖 AnalysisEngine response: \(text.prefix(500))")
@@ -143,26 +145,10 @@ final class AnalysisEngine {
 
     // MARK: - API Key
 
-    /// Remote Config first (lets the key change without a new build), then Secrets.plist.
-    private func resolveAPIKey() async -> String {
-        if FirebaseService.isConfigured {
-            let rc = RemoteConfig.remoteConfig()
-            let rcSettings = RemoteConfigSettings()
-            #if DEBUG
-            rcSettings.minimumFetchInterval = 0
-            #else
-            rcSettings.minimumFetchInterval = 3600
-            #endif
-            rc.configSettings = rcSettings
-            _ = try? await rc.fetchAndActivate()
-            let key = rc.configValue(forKey: "GEMINI_API_KEY").stringValue
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-            if !key.isEmpty { return key }
-        }
-
+    private func resolveAPIKey() -> String {
         guard let url = Bundle.main.url(forResource: "Secrets", withExtension: "plist"),
               let dict = NSDictionary(contentsOf: url) as? [String: Any],
-              let key = dict["GEMINI_API_KEY"] as? String
+              let key = dict["XAI_API_KEY"] as? String
         else { return "" }
         return key.trimmingCharacters(in: .whitespacesAndNewlines)
     }
@@ -183,7 +169,9 @@ final class AnalysisEngine {
         4. If you see Protein in urine + Rising Blood Pressure + Low Platelet count, name it (Pre-eclampsia risk).
         5. Be clinically precise but empathetic — the reader is a pregnant mother, not a physician.
         6. Never fabricate values. If data is missing, note it and reason around it.
-        7. If image quality is poor or no numeric values can be extracted, set confidence to "low".
+        7. Always return "confidence_score": an integer 0–100 for how confident you are in this \
+           assessment. Lower it for missing bio-markers, no lab reports, poor image quality or \
+           unreadable values; raise it when several data sources agree.
         8. The MOST IMPORTANT field is "personalized_message" — write it as her caring OB-GYN \
            speaking warmly and directly to her, not as a clinical report. Use "you" and "your baby". \
            Reference her gestational week. Celebrate good numbers. If risk is low or moderate, be \
@@ -268,7 +256,7 @@ final class AnalysisEngine {
             "<test name>": "<value with unit>",
             "<test name>": "<value with unit>"
           },
-          "confidence": "high" | "low"
+          "confidence_score": <integer 0-100>
         }
         """
     }
@@ -300,7 +288,7 @@ final class AnalysisEngine {
             actionItems: ["Consult your OB-GYN as soon as possible for a full review."],
             flaggedMarkers: [],
             extractedLabValues: [:],
-            isLowConfidence: false
+            confidenceScore: 0
         )
     }
 
@@ -312,7 +300,11 @@ final class AnalysisEngine {
         let actions    = json["action_items"] as? [String] ?? []
         let flagged    = json["flagged_markers"] as? [String] ?? []
         let labValues  = json["extracted_lab_values"] as? [String: String] ?? [:]
-        let confidence = json["confidence"] as? String ?? "high"
+        // Models sometimes send numbers as strings or doubles.
+        let rawScore   = (json["confidence_score"] as? NSNumber)?.doubleValue
+            ?? Double(json["confidence_score"] as? String ?? "")
+            ?? 0
+        let confidence = Int(min(max(rawScore.rounded(), 0), 100))
 
         return AIAnalysisResult(
             riskLevel:           AIAnalysisResult.RiskLevel(rawValue: riskRaw) ?? .moderate,
@@ -322,7 +314,7 @@ final class AnalysisEngine {
             actionItems:         actions,
             flaggedMarkers:      flagged,
             extractedLabValues:  labValues,
-            isLowConfidence:     confidence == "low"
+            confidenceScore:     confidence
         )
     }
 }

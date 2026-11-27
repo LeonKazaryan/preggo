@@ -281,7 +281,7 @@ struct ProfileView: View {
             VStack(spacing: 0) {
                 AboutRow(label: "Version", value: "1.0.0")
                 Divider().padding(.leading, 56)
-                AboutRow(label: "AI Model", value: "Gemini 2.5 Flash")
+                AboutRow(label: "AI Model", value: "Grok 4.20")
                 Divider().padding(.leading, 56)
                 AboutRow(label: "Team", value: "Kazaryan · Ashykhatov · Dautbek")
             }

@@ -38,9 +38,9 @@ final class HealthViewModel {
         if appState?.isDemoMode == true {
             let demo = HealthKitManager.loadDemoData()
             bioMarkers = demo
-            // Fire-and-forget: Firestore only resolves after the server acks, which
+            // Fire-and-forget: the iCloud save resolves only after the server acks, which
             // would keep the loading state up while offline.
-            Task { try? await FirebaseService.shared.saveBioMarkers(demo) }
+            Task { try? await CloudSyncService.shared.saveBioMarkers(demo) }
             return
         }
 
@@ -48,7 +48,7 @@ final class HealthViewModel {
             try await HealthKitManager.shared.requestPermissions()
             let markers = try await HealthKitManager.shared.fetchTodayBioMarkers()
             bioMarkers = markers
-            Task { try? await FirebaseService.shared.saveBioMarkers(markers) }
+            Task { try? await CloudSyncService.shared.saveBioMarkers(markers) }
         } catch let error as HealthKitError {
             errorMessage = error.errorDescription
         } catch {
@@ -59,12 +59,15 @@ final class HealthViewModel {
     // MARK: - AI Analysis
 
     func runAIAnalysis() async {
+        // Ignore repeat taps while a request is in flight.
+        guard !isLoadingAI else { return }
         guard let markers = bioMarkers else {
             errorMessage = "Load your health data before running an analysis."
             return
         }
 
         isLoadingAI = true
+        errorMessage = nil
         defer { isLoadingAI = false }
 
         let profile = appState?.patientProfile ?? .demo
@@ -84,7 +87,7 @@ final class HealthViewModel {
             appState?.lastAnalysisDocumentCount = documentImages.count
 
             Task {
-                try? await FirebaseService.shared.saveAnalysis(
+                try? await CloudSyncService.shared.saveAnalysis(
                     analysis,
                     gestationalWeek: profile.gestationalWeek
                 )
